@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.271
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsyncApplication", "AsyncApplication\AsyncApplication.csproj", "{454DC966-6557-43FE-A57F-32680FE4064D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsyncApplicationTests", "AsyncApplicationTests\AsyncApplicationTests.csproj", "{AF2FAB26-51B6-48F1-9B50-9AC20226B8F5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{454DC966-6557-43FE-A57F-32680FE4064D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{454DC966-6557-43FE-A57F-32680FE4064D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{454DC966-6557-43FE-A57F-32680FE4064D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{454DC966-6557-43FE-A57F-32680FE4064D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF2FAB26-51B6-48F1-9B50-9AC20226B8F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF2FAB26-51B6-48F1-9B50-9AC20226B8F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF2FAB26-51B6-48F1-9B50-9AC20226B8F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF2FAB26-51B6-48F1-9B50-9AC20226B8F5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {78F0F77F-D955-4574-B9EB-62C59F1BDEB2}
+	EndGlobalSection
+EndGlobal
