@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Net;
+ 
 
 namespace AsyncApplication
 {
@@ -11,7 +12,15 @@ namespace AsyncApplication
     {
         static void Main(string[] args)
         {
-            Tasks.GetMD5Async(new Uri("https://www.yandex.ru"));
+
+           string[] sites = {
+           "google", "msdn",  "facebook", "linkedin", "twitter",
+           "bing", "youtube",  "baidu",    "amazon", "gmail"};
+
+            var a = sites.Select(x => new Uri(string.Format(@"http://{0}.com", x)));
+
+            a.GetUrlContentAsync(3);
+
 
             Console.ReadLine();
         }

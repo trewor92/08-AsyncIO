@@ -4,7 +4,7 @@ using AsyncApplication.Tests.Extentions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Diagnostics;
 using System.Collections.Generic;
-using AsyncApplicationTests;
+
 using System.IO;
 
 namespace AsyncApplication.Tests

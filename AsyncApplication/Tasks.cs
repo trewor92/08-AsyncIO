@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -43,28 +44,29 @@ namespace AsyncApplication
         /// <param name="uris">Sequence of required uri</param>
         /// <param name="maxConcurrentStreams">Max count of concurrent request streams</param>
         /// <returns>The sequence of downloaded url content</returns>
-        public static  IEnumerable<string> GetUrlContentAsync(this IEnumerable<Uri> uris, int maxConcurrentStreams)
+        public static   IEnumerable<string> GetUrlContentAsync(this IEnumerable<Uri> uris, int maxConcurrentStreams)
         {
-          //  WebClient client = new WebClient();
-            Semaphore sm = new Semaphore(maxConcurrentStreams, maxConcurrentStreams);           
+            Semaphore sm = new Semaphore(maxConcurrentStreams, maxConcurrentStreams);
+            ConcurrentDictionary<int,string> resultCollection = new ConcurrentDictionary<int,string>();
+
+            var res = uris.Select(async (uri,n) =>
+                {
+                    sm.WaitOne();
+                    resultCollection.TryAdd(n, await new WebClient().DownloadStringTaskAsync(uri));
+                    sm.Release();
+                });
 
 
-            var res = uris.Select(async x =>
-           {
-               sm.WaitOne();
-               var result =   await new WebClient().DownloadStringTaskAsync(x);
-               sm.Release();
-               return result;
-            });
+            Task.WaitAll(res.ToArray());
 
-            Task.WhenAll(res);
+            return resultCollection.OrderBy(x=>x.Key).Select(x=>x.Value); 
 
-            return res.Select(x => x.Result);             
+         
             // TODO : Implement GetUrlContentAsync
             //throw new NotImplementedException();
         }
 
-       
+
 
 
         /// <summary>
