@@ -8,6 +8,7 @@ using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 
+
 namespace AsyncApplication
 {
     public static class Tasks
@@ -44,31 +45,37 @@ namespace AsyncApplication
         /// <param name="uris">Sequence of required uri</param>
         /// <param name="maxConcurrentStreams">Max count of concurrent request streams</param>
         /// <returns>The sequence of downloaded url content</returns>
-        public static   IEnumerable<string> GetUrlContentAsync(this IEnumerable<Uri> uris, int maxConcurrentStreams)
+        public static IEnumerable<string> GetUrlContentAsync(this IEnumerable<Uri> uris, int maxConcurrentStreams)
         {
-            Semaphore sm = new Semaphore(maxConcurrentStreams, maxConcurrentStreams);
-            ConcurrentDictionary<int,string> resultCollection = new ConcurrentDictionary<int,string>();
+            // Semaphore sm = new Semaphore(maxConcurrentStreams, maxConcurrentStreams);
+              
+            var collectionTasks = uris.Select(async uri =>
+            await new WebClient().DownloadStringTaskAsync(uri));
 
-            var res = uris.Select(async (uri,n) =>
-                {
-                    sm.WaitOne();
-                    resultCollection.TryAdd(n, await new WebClient().DownloadStringTaskAsync(uri));
-                    sm.Release();
-                });
+            
+            var queue = new Queue<Task<string>>(collectionTasks.Take(maxConcurrentStreams));
+            var initialQueueCount = queue.Count();
+
+            var actualEnumerator = collectionTasks.Skip(maxConcurrentStreams).GetEnumerator();
+                        
+            while (actualEnumerator.MoveNext())
+            {
+                queue.Enqueue(actualEnumerator.Current);
+                yield return queue.Dequeue().Result;
+            }
+
+            while (initialQueueCount >0)
+            {
+                initialQueueCount--;
+                yield return queue.Dequeue().Result;
+            }
 
 
-            Task.WaitAll(res.ToArray());
-
-            return resultCollection.OrderBy(x=>x.Key).Select(x=>x.Value); 
-
-         
             // TODO : Implement GetUrlContentAsync
             //throw new NotImplementedException();
         }
 
-
-
-
+      
         /// <summary>
         /// Calculates MD5 hash of required resource.
         /// 
