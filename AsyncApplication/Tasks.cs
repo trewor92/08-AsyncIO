@@ -49,24 +49,29 @@ namespace AsyncApplication
         {
             // Semaphore sm = new Semaphore(maxConcurrentStreams, maxConcurrentStreams);
               
-            var collectionTasks = uris.Select(async uri =>
-            await new WebClient().DownloadStringTaskAsync(uri));
+            var collectionTasksEnumerator = uris.Select(async uri =>
+            await new WebClient().DownloadStringTaskAsync(uri)).GetEnumerator();
 
-            
-            var queue = new Queue<Task<string>>(collectionTasks.Take(maxConcurrentStreams));
-            var initialQueueCount = queue.Count();
 
-            var actualEnumerator = collectionTasks.Skip(maxConcurrentStreams).GetEnumerator();
-                        
-            while (actualEnumerator.MoveNext())
+            var queue = new Queue<Task<string>>();
+
+ 
+
+            for (int i = 0; i < maxConcurrentStreams; i++)
             {
-                queue.Enqueue(actualEnumerator.Current);
+                if (collectionTasksEnumerator.MoveNext())
+                    queue.Enqueue(collectionTasksEnumerator.Current);
+            }
+
+
+            while (collectionTasksEnumerator.MoveNext())
+            {
+                queue.Enqueue(collectionTasksEnumerator.Current);
                 yield return queue.Dequeue().Result;
             }
 
-            while (initialQueueCount >0)
+            while (queue.Count()>0)
             {
-                initialQueueCount--;
                 yield return queue.Dequeue().Result;
             }
 

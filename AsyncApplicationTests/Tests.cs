@@ -6,6 +6,8 @@ using System.Diagnostics;
 using System.Collections.Generic;
 
 using System.IO;
+using System.Net;
+using System.IO.Compression;
 
 namespace AsyncApplication.Tests
 {
@@ -87,9 +89,43 @@ namespace AsyncApplication.Tests
             Check_Is_Action_Asynchronous(action, true);
         }
 
+        [TestMethod]
+        [TestCategory("GetUrlContentAsync")]
+        public void GetUrlContentAsync_Should_Run_Fast()
+        {
+            var resource = "http://s3.amazonaws.com/alexa-static/top-1m.csv.zip";
+
+            var sw = new Stopwatch();
+            sw.Start();
+            var result = ReadFile(resource).Take(1).GetUrlContentAsync(3);
+            sw.Stop();
+            Trace.WriteLine("Time : " + sw.Elapsed.ToString());
+            
+
+            Assert.IsTrue(result.Count(x=>x.Length>100)==1, "reading was unsuccess");
+ 
+        }
+
+        private static IEnumerable<Uri> ReadFile(string resource)
+        {
+            var stream = new WebClient().OpenRead(new Uri(resource));
+            ZipArchive archive = new ZipArchive(stream);
+            ZipArchiveEntry entry = archive.GetEntry("top-1m.csv");
+            using (Stream unzippedEntryStream = entry.Open())
+            {
+                StreamReader streamReader = new StreamReader(unzippedEntryStream);
+                string line;
+                while ((line = streamReader.ReadLine()) != null)
+                {
+                    var res = line.Split(',').Skip(1).First();
+                    yield return new Uri(string.Format(@"http://{0}", res));
+                }
+            }
+        }
 
 
-        
+
+
         [TestMethod]
         [TestCategory("GetUrlMD5")]
         public void GetUrlMD5_Should_Return_CorrectValue()
